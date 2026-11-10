@@ -8,6 +8,8 @@ const objectSelect = $('objects');
 const settings = $('text-settings');
 const fields = { text: $('text-content'), font: $('text-font'), size: $('text-size'), color: $('text-color'), align: $('text-align'), strokeWidth: $('stroke-width'), stroke: $('stroke-color'), bold: $('text-bold') };
 let scene = MemeScene.createScene();
+let history = new MemeScene.History(scene);
+let loadGeneration = 0;
 let drag = null;
 
 function fontFor(item) { return `${item.bold ? 'bold ' : ''}${item.size}px ${item.font}`; }
@@ -42,10 +44,12 @@ function render() {
   paint(context, scene, true);
   $('canvas-size').textContent = `${scene.width} × ${scene.height}`;
   backgroundInput.value = scene.background;
+  $('undo').disabled = !history.canUndo;
+  $('redo').disabled = !history.canRedo;
   const item = MemeScene.selected(scene);
   objectSelect.replaceChildren();
   if (!scene.texts.length) objectSelect.add(new Option('Нет надписей', ''));
-  for (const text of scene.texts) objectSelect.add(new Option(text.text.replace(/\s+/g, ' ').slice(0, 32) || 'Пустая надпись', String(text.id)));
+  for (const text of scene.texts) objectSelect.add(new Option(`Надпись ${text.id}: ${text.text.replace(/\s+/g, ' ').slice(0, 24) || 'пустая'}`, String(text.id)));
   objectSelect.disabled = !scene.texts.length;
   objectSelect.value = item ? String(item.id) : '';
   settings.disabled = !item;
@@ -54,8 +58,11 @@ function render() {
     else if (document.activeElement !== element) element.value = item[key];
   }
 }
-function changed() { message.textContent = ''; render(); }
-$('new-project').addEventListener('click', () => { scene = MemeScene.createScene(); changed(); });
+function changed() { message.textContent = ''; history.record(scene); render(); }
+$('new-project').addEventListener('click', () => {
+  if ((scene.image || scene.texts.length || scene.background !== '#ffffff') && !window.confirm('Начать новый проект? Текущие изменения будут удалены.')) return;
+  loadGeneration += 1; scene = MemeScene.createScene(); history.reset(scene); message.textContent = ''; render();
+});
 backgroundInput.addEventListener('input', () => { scene.background = backgroundInput.value; changed(); });
 $('add-text').disabled = false;
 $('add-text').addEventListener('click', () => { MemeScene.addText(scene); changed(); });
@@ -89,13 +96,57 @@ canvas.addEventListener('pointermove', (event) => {
   if (!item) return;
   item.x = drag.startX + point.x - drag.x; item.y = drag.startY + point.y - drag.y; render();
 });
-canvas.addEventListener('pointerup', () => { drag = null; });
-canvas.addEventListener('pointercancel', () => { drag = null; });
+canvas.addEventListener('pointerup', () => { if (drag) { const item = scene.texts.find((text) => text.id === drag.id); if (item && (item.x !== drag.startX || item.y !== drag.startY)) changed(); } drag = null; });
+canvas.addEventListener('pointercancel', () => { if (drag) { const item = scene.texts.find((text) => text.id === drag.id); if (item) { item.x = drag.startX; item.y = drag.startY; } drag = null; render(); } });
 canvas.addEventListener('keydown', (event) => {
   const item = MemeScene.selected(scene); if (!item) return;
   const movements = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
   if (!movements[event.key]) return;
   event.preventDefault(); const step = event.shiftKey ? 10 : 1;
   item.x += movements[event.key][0] * step; item.y += movements[event.key][1] * step; changed();
+});
+$('undo').addEventListener('click', () => { const previous = history.undo(); if (previous) { scene = previous; message.textContent = ''; render(); } });
+$('redo').addEventListener('click', () => { const next = history.redo(); if (next) { scene = next; message.textContent = ''; render(); } });
+const imageFile = $('image-file');
+imageFile.disabled = false;
+imageFile.addEventListener('change', () => {
+  const file = imageFile.files[0];
+  if (!file) return;
+  const run = ++loadGeneration;
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+    message.textContent = 'Выберите изображение PNG, JPEG или WebP.'; imageFile.value = ''; return;
+  }
+  if (file.size > 10000000) {
+    message.textContent = 'Размер изображения не должен превышать 10 МБ.'; imageFile.value = ''; return;
+  }
+  const url = URL.createObjectURL(file);
+  const image = new Image();
+  image.onload = () => {
+    URL.revokeObjectURL(url);
+    if (run !== loadGeneration) return;
+    if (!image.naturalWidth || !image.naturalHeight) { message.textContent = 'Не удалось прочитать изображение.'; return; }
+    scene.image = image; scene.width = image.naturalWidth; scene.height = image.naturalHeight;
+    imageFile.value = ''; changed();
+  };
+  image.onerror = () => {
+    URL.revokeObjectURL(url);
+    if (run === loadGeneration) { message.textContent = 'Не удалось прочитать изображение. Выберите другой файл.'; imageFile.value = ''; }
+  };
+  image.src = url;
+});
+$('download').disabled = false;
+$('download').addEventListener('click', async () => {
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const output = document.createElement('canvas'); output.width = scene.width; output.height = scene.height;
+    const ctx = output.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
+    paint(ctx, scene, false);
+    const blob = await new Promise((resolve) => output.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('PNG unavailable');
+    const url = URL.createObjectURL(blob); const anchor = document.createElement('a');
+    anchor.href = url; anchor.download = 'meme.png'; anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    message.textContent = '';
+  } catch (_) { message.textContent = 'Не удалось сохранить мем. Попробуйте ещё раз.'; }
 });
 render();

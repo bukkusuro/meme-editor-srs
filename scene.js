@@ -26,5 +26,22 @@
     if (where === 'front') scene.texts.push(item); else scene.texts.unshift(item);
     return true;
   }
-  return { createScene, addText, selected, removeSelected, moveLayer };
+  function snapshot(scene) {
+    return { ...scene, texts: scene.texts.map((item) => ({ ...item })) };
+  }
+  class History {
+    constructor(scene, limit = 100) { this.limit = Math.max(21, limit); this.reset(scene); }
+    reset(scene) { this.states = [snapshot(scene)]; this.index = 0; }
+    record(scene) {
+      this.states = this.states.slice(0, this.index + 1);
+      this.states.push(snapshot(scene));
+      if (this.states.length > this.limit) this.states.shift();
+      this.index = this.states.length - 1;
+    }
+    get canUndo() { return this.index > 0; }
+    get canRedo() { return this.index < this.states.length - 1; }
+    undo() { if (!this.canUndo) return null; this.index -= 1; return snapshot(this.states[this.index]); }
+    redo() { if (!this.canRedo) return null; this.index += 1; return snapshot(this.states[this.index]); }
+  }
+  return { createScene, addText, selected, removeSelected, moveLayer, History };
 });
