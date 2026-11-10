@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860">
+<rect width="1600" height="860" fill="#faf8f4"/><text x="60" y="70" font-family="sans-serif" font-size="32" font-weight="bold" fill="#252735">ER-модель редактора мемов</text>
+<path d="M450 215 L550 215" fill="none" stroke="#e16e58" stroke-width="3"/><text x="455" y="206" font-family="sans-serif" font-size="20" fill="#974632">1</text><text x="495" y="206" font-family="sans-serif" font-size="20" fill="#974632">0..N</text>
+<path d="M950 275 L1150 275" fill="none" stroke="#e16e58" stroke-width="3"/><text x="955" y="266" font-family="sans-serif" font-size="20" fill="#974632">1</text><text x="1095" y="266" font-family="sans-serif" font-size="20" fill="#974632">0..N</text>
+<path d="M450 550 L1150 550" fill="none" stroke="#e16e58" stroke-width="3"/><text x="455" y="541" font-family="sans-serif" font-size="20" fill="#974632">1</text><text x="1095" y="541" font-family="sans-serif" font-size="20" fill="#974632">0..N</text>
+<rect x="60" y="120" width="390" height="195" rx="10" fill="white" stroke="#565965" stroke-width="2"/><path d="M61 172 H449" stroke="#565965"/><text x="75" y="154" font-family="sans-serif" font-size="24" font-weight="bold" fill="#252735">images</text>
+<text x="75" y="202" font-family="sans-serif" font-size="21" fill="#343741">PK image_id</text>
+<text x="75" y="244" font-family="sans-serif" font-size="21" fill="#343741">file_name, mime_type</text>
+<text x="75" y="286" font-family="sans-serif" font-size="21" fill="#343741">data (BLOB), width, height</text>
+<rect x="60" y="470" width="390" height="180" rx="10" fill="white" stroke="#565965" stroke-width="2"/><path d="M61 522 H449" stroke="#565965"/><text x="75" y="504" font-family="sans-serif" font-size="24" font-weight="bold" fill="#252735">fonts</text>
+<text x="75" y="552" font-family="sans-serif" font-size="21" fill="#343741">PK font_id</text>
+<text x="75" y="594" font-family="sans-serif" font-size="21" fill="#343741">name (UNIQUE)</text>
+<rect x="550" y="120" width="400" height="315" rx="10" fill="white" stroke="#565965" stroke-width="2"/><path d="M551 172 H949" stroke="#565965"/><text x="565" y="154" font-family="sans-serif" font-size="24" font-weight="bold" fill="#252735">projects</text>
+<text x="565" y="202" font-family="sans-serif" font-size="21" fill="#343741">PK project_id</text>
+<text x="565" y="244" font-family="sans-serif" font-size="21" fill="#343741">name</text>
+<text x="565" y="286" font-family="sans-serif" font-size="21" fill="#343741">canvas_width, canvas_height</text>
+<text x="565" y="328" font-family="sans-serif" font-size="21" fill="#343741">background_color</text>
+<text x="565" y="370" font-family="sans-serif" font-size="21" fill="#343741">FK image_id (nullable)</text>
+<text x="565" y="412" font-family="sans-serif" font-size="21" fill="#343741">created_at, updated_at</text>
+<rect x="1150" y="120" width="390" height="590" rx="10" fill="white" stroke="#565965" stroke-width="2"/><path d="M1151 172 H1539" stroke="#565965"/><text x="1165" y="154" font-family="sans-serif" font-size="24" font-weight="bold" fill="#252735">text_layers</text>
+<text x="1165" y="202" font-family="sans-serif" font-size="21" fill="#343741">PK layer_id</text>
+<text x="1165" y="244" font-family="sans-serif" font-size="21" fill="#343741">FK project_id</text>
+<text x="1165" y="286" font-family="sans-serif" font-size="21" fill="#343741">FK font_id</text>
+<text x="1165" y="328" font-family="sans-serif" font-size="21" fill="#343741">content</text>
+<text x="1165" y="370" font-family="sans-serif" font-size="21" fill="#343741">position_x, position_y</text>
+<text x="1165" y="412" font-family="sans-serif" font-size="21" fill="#343741">font_size, text_color</text>
+<text x="1165" y="454" font-family="sans-serif" font-size="21" fill="#343741">alignment, is_bold</text>
+<text x="1165" y="496" font-family="sans-serif" font-size="21" fill="#343741">stroke_color, stroke_width</text>
+<text x="1165" y="538" font-family="sans-serif" font-size="21" fill="#343741">layer_order</text>
+<text x="1165" y="580" font-family="sans-serif" font-size="21" fill="#343741">UNIQUE (project_id, layer_order)</text>
+</svg>
