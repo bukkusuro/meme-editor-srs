@@ -3,9 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Создайте мем из изображения и текста прямо в браузере.">
   <title>Редактор мемов</title>
   <link rel="stylesheet" href="style.css">
+  <script src="scene.js" defer></script>
   <script src="script.js" defer></script>
 </head>
-<body><main><h1>Редактор мемов</h1><p>Приложение готовится к разработке.</p></main></body>
+<body>
+  <header class="topbar"><div class="shell topbar-inner"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">м</span> Мастерская мемов</a><span class="private-note">Всё остаётся на вашем устройстве</span></div></header>
+  <main class="shell app">
+    <div class="intro"><div><h1>Создайте свой мем</h1><p>Добавьте изображение, напишите текст и сохраните результат.</p></div><span class="file-type">PNG, JPEG, WebP · до 10 МБ</span></div>
+    <div class="toolbar" aria-label="Основные действия">
+      <button id="new-project" type="button">Новый проект</button>
+      <label class="button" for="image-file">Загрузить изображение</label><input class="visually-hidden" id="image-file" type="file" accept="image/png,image/jpeg,image/webp" disabled>
+      <button id="add-text" type="button" disabled>Добавить текст</button>
+      <span class="toolbar-spacer"></span>
+      <button id="undo" type="button" disabled>Отменить</button><button id="redo" type="button" disabled>Повторить</button>
+      <button id="download" class="primary" type="button" disabled>Скачать мем</button>
+    </div>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+    <div class="workbench">
+      <section class="canvas-section" aria-labelledby="canvas-heading"><div class="section-head"><div><h2 id="canvas-heading">Холст</h2><p>Выделите надпись, чтобы изменить её</p></div><span id="canvas-size" class="canvas-size">1200 × 1200</span></div><div class="canvas-wrap"><canvas id="canvas" width="1200" height="1200" tabindex="0" aria-label="Холст редактора мемов"></canvas></div><p class="canvas-hint">Перемещайте надписи мышью или стрелками на клавиатуре.</p></section>
+      <aside class="properties" aria-labelledby="properties-heading"><div class="section-head"><div><h2 id="properties-heading">Настройки</h2><p>Оформление и слои</p></div></div>
+        <label class="field" for="background-color"><span>Цвет фона</span><input id="background-color" type="color" value="#ffffff"></label>
+        <div class="divider"></div>
+        <label class="field" for="objects"><span>Надпись</span><select id="objects" disabled><option value="">Нет надписей</option></select></label>
+        <fieldset id="text-settings" disabled><legend class="sr-only">Свойства надписи</legend>
+          <label class="field" for="text-content"><span>Текст</span><textarea id="text-content" rows="3" placeholder="Ваша надпись"></textarea></label>
+          <label class="field" for="text-font"><span>Шрифт</span><select id="text-font"><option value="Impact">Impact</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Verdana">Verdana</option></select></label>
+          <div class="field-grid"><label class="field" for="text-size"><span>Размер</span><input id="text-size" type="number" min="8" max="400" value="64"></label><label class="field" for="text-color"><span>Цвет текста</span><input id="text-color" type="color" value="#ffffff"></label></div>
+          <label class="field" for="text-align"><span>Выравнивание</span><select id="text-align"><option value="center">По центру</option><option value="left">По левому краю</option><option value="right">По правому краю</option></select></label>
+          <div class="field-grid"><label class="field" for="stroke-width"><span>Обводка, px</span><input id="stroke-width" type="number" min="0" max="30" value="3"></label><label class="field" for="stroke-color"><span>Цвет обводки</span><input id="stroke-color" type="color" value="#000000"></label></div>
+          <label class="checkbox"><input id="text-bold" type="checkbox" checked> Жирное начертание</label>
+          <div class="layer-buttons"><button id="bring-front" type="button">На передний план</button><button id="send-back" type="button">На задний план</button><button id="delete-text" class="danger" type="button">Удалить надпись</button></div>
+        </fieldset>
+      </aside>
+    </div>
+    <p class="footnote">Изображение и текст обрабатываются в браузере, без загрузки на сервер.</p>
+  </main>
+  <noscript><p class="noscript">Чтобы пользоваться редактором, включите JavaScript.</p></noscript>
+</body>
 </html>
