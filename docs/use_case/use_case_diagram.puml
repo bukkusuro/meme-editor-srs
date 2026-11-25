@@ -1,0 +1,39 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Dialog
+skinparam shadowing false
+skinparam ArrowColor #34465F
+skinparam usecase {
+  BackgroundColor #EEF5FF
+  BorderColor #43658C
+}
+skinparam rectangle {
+  BackgroundColor #FAFCFF
+  BorderColor #34465F
+}
+
+title Редактор мемов в браузере
+actor "Пользователь" as User
+
+rectangle " " as Editor {
+  usecase "Начать новый\nпроект" as New
+  usecase "Загрузить\nизображение" as Load
+  usecase "Отредактировать\nмем" as Edit
+  usecase "Отменить или\nповторить изменение" as History
+  usecase "Скачать PNG" as Export
+  usecase "Проверить формат\nи размер файла" as Validate
+  usecase "Показать ошибку\nзагрузки" as LoadError
+  usecase "Обновить\nпредпросмотр" as Preview
+  usecase "Подтвердить создание\nнового проекта" as Confirm
+}
+
+User -- New
+User -- Load
+User -- Edit
+User -- History
+User -- Export
+Confirm ..> New : <<extend>>\n[в сцене есть изменения]
+Load ..> Validate : <<include>>
+LoadError ..> Load : <<extend>>\n[файл отклонён или не прочитан]
+Edit ..> Preview : <<include>>
+@enduml

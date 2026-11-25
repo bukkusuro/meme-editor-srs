@@ -1,0 +1,34 @@
+@startuml
+!include _style.iuml
+title SQ-03 · Отмена и повтор изменений
+actor "Пользователь" as User
+boundary "Панель и холст" as UI
+control "script.js" as App
+participant "History" as History
+autonumber
+
+note over App, History
+  Изменения формируют снимки сцены.
+  При новой правке после отмены ветка повтора отбрасывается.
+end note
+User -> UI : Нажимает «Отменить» или «Повторить»
+UI -> App : click
+alt Отмена
+  App -> History : undo()
+else Повтор
+  App -> History : redo()
+end
+alt Есть состояние в выбранном направлении
+  History -> History : Меняет индекс текущего снимка
+  History --> App : Копия нужного состояния
+  App -> App : Заменяет текущую сцену
+  App -> UI : Очищает сообщение, перерисовывает холст\nи обновляет кнопки истории
+  UI --> User : Показывает восстановленную сцену
+else Снимка нет
+  History --> App : null
+  note over UI, App
+    Кнопка недоступна на границе истории.
+    При null обработчик сохраняет текущую сцену.
+  end note
+end
+@enduml
