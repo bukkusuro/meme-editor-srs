@@ -1,0 +1,29 @@
+@startuml
+!include _style.iuml
+title SQ-02 · Добавление и редактирование надписи
+actor "Пользователь" as User
+boundary "Панель и холст" as UI
+control "script.js" as App
+participant "MemeScene" as Model
+participant "History" as History
+autonumber
+
+User -> UI : Нажимает «Добавить текст»
+UI -> App : click
+App -> Model : addText(scene)
+Model --> App : Надпись с ID, стилем по умолчанию\nи признаком выделения
+App -> History : record(scene)
+App -> UI : Рисует надпись и маркер выделения
+User -> UI : Меняет текст или стиль выбранного блока
+UI -> App : input
+App -> Model : selected(scene)
+Model --> App : Выбранный блок или null
+alt Блок выбран, значение принято
+  App -> App : Обновляет свойство.\nРазмер и обводку ограничивает диапазоном
+  App -> History : record(scene)
+  App -> UI : Обновляет предпросмотр и список надписей
+  UI --> User : Показывает изменённый блок
+else Нет выбранного блока или числовое значение некорректно
+  App -> App : Завершает обработчик без записи в историю
+end
+@enduml
