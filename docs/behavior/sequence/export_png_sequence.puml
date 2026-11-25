@@ -1,0 +1,30 @@
+@startuml
+!include _style.iuml
+title SQ-04 · Экспорт мема в PNG
+actor "Пользователь" as User
+boundary "Интерфейс" as UI
+control "script.js" as App
+participant "Canvas для\nэкспорта" as Canvas
+participant "Браузер" as Browser
+autonumber
+
+User -> UI : Нажимает «Скачать мем»
+UI -> App : click
+App -> Browser : При наличии ожидает document.fonts.ready
+App -> Browser : Создаёт временный canvas\nс шириной и высотой сцены
+Browser --> App : Canvas для экспорта
+App -> Canvas : Запрашивает контекст 2D
+alt Контекст доступен, отрисовка успешна
+  App -> Canvas : paint(ctx, scene, false)\nРисует фон, изображение и текст без выделения
+  App -> Canvas : toBlob(callback, 'image/png')
+  Canvas --> App : PNG или null
+  alt PNG готов
+    App -> Browser : Создаёт временный URL,\nзапускает скачивание и освобождает URL по таймеру
+    Browser --> User : Сохраняет meme.png
+  else PNG не создан
+    App -> UI : Показывает сообщение о сбое сохранения
+  end
+else Нет контекста или произошёл сбой
+  App -> UI : Показывает сообщение о сбое сохранения
+end
+@enduml
